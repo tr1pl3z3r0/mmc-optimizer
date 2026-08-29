@@ -124,7 +124,7 @@ stable_dce, c, d = check_and_print(
     "DC Externo", Kp_dce, Ki_dce,
     plant_num=np.array([1.0]),
     plant_den=np.array([n * C * Vc, 0.0]),
-    var1="c", var2="d", sign=-1)
+    var1="c", var2="d", sign=+1)  # error = E - V0Σ → neg_fb clásico → positivo
 
 Kp_dci, Ki_dci = design_dc_int(bw=200.0)
 stable_dci, e, f = check_and_print(

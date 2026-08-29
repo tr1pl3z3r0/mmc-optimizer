@@ -38,16 +38,17 @@ threading.Thread(target=_listen_for_stop, daemon=True).start()
 
 # ── Puntos de diseño analíticos (semilla) ────────────────────────────────────
 # Calculados en design_points.py — polos LC verificados en semiplano izquierdo
-X0 = [1.8, 400.0, -9000.0, -60000.0, 0.9, 60.0]
+X0 = [1.8, 400.0, 9000.0, 60000.0, 0.9, 60.0]
 
-# ── Espacio de búsqueda — centrado en la semilla, ±orden de magnitud ─────────
+# ── Espacio de búsqueda ───────────────────────────────────────────────────────
+# Error DC ext = E - V0Σ → neg_fb clásico → c,d positivos
 SPACE = [
-    Real(0.01,      200.0,   name="a"),   # Kp AC — rango amplio por ganancia reducida de planta
-    Real(10.0,      50000.0, name="b"),   # Ki AC
-    Real(-50000.0, -100.0,   name="c"),   # Kp DC ext — negativo (pos_fb)
-    Real(-500000.0,-1000.0,  name="d"),   # Ki DC ext — negativo (pos_fb)
-    Real(0.01,      5.0,     name="e"),   # Kp DC int — positivo (neg_fb clásico)
-    Real(1.0,       500.0,   name="f"),   # Ki DC int — positivo (neg_fb clásico)
+    Real(0.01,      200.0,   name="a"),   # Kp AC  — neg_fb clásico, positivo
+    Real(10.0,      50000.0, name="b"),   # Ki AC  — neg_fb clásico, positivo
+    Real(100.0,     50000.0, name="c"),   # Kp DC ext — neg_fb clásico, positivo
+    Real(1000.0,    500000.0,name="d"),   # Ki DC ext — neg_fb clásico, positivo
+    Real(0.01,      5.0,     name="e"),   # Kp DC int — neg_fb clásico, positivo
+    Real(1.0,       500.0,   name="f"),   # Ki DC int — neg_fb clásico, positivo
 ]
 
 PARAM_NAMES = ["a", "b", "c", "d", "e", "f"]
@@ -105,9 +106,9 @@ def _is_stable_point(a, b, c, d, e, f):
     Ltot, R, n_mmc, C_cap, Vc = 4.5e-3, 1.0, 3, 1.0, 150.0  # Ltot = L + 2*Ll
     # AC: realimentación negativa clásica, controlador positivo
     ok_ac  = _poles_stable(a, b, [1.0], [Ltot, R],                  pos_fb=False)
-    # DC externo: realimentación positiva (controlador negativo, planta negativa)
-    ok_dce = _poles_stable(c, d, [1.0], [n_mmc * C_cap * Vc, 0.0], pos_fb=True)
-    # DC interno: realimentación negativa clásica, controlador positivo
+    # DC externo: error = E - V0Σ → neg_fb clásico, controlador positivo
+    ok_dce = _poles_stable(c, d, [1.0], [n_mmc * C_cap * Vc, 0.0], pos_fb=False)
+    # DC interno: neg_fb clásico, controlador positivo
     ok_dci = _poles_stable(e, f, [1.0], [Ltot, 0.0],                pos_fb=False)
     return ok_ac and ok_dce and ok_dci
 
