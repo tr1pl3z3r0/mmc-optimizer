@@ -14,7 +14,7 @@ import numpy as np
 from numpy.polynomial import polynomial as P
 
 # ── Parámetros del circuito ───────────────────────────────────────────────────
-Ltot = 2.5e-3
+Ltot = 2.5e-3 + 2*1e-3  # L + 2*Ll = 4.5e-3 H
 R    = 1.0
 n    = 3
 C    = 1.0
@@ -117,7 +117,7 @@ stable_ac, a, b = check_and_print(
     "AC Port", Kp_ac, Ki_ac,
     plant_num=np.array([1.0]),
     plant_den=np.array([Ltot, R]),
-    var1="a", var2="b", sign=-1)
+    var1="a", var2="b", sign=+1)   # neg_fb clásico, controlador positivo
 
 Kp_dce, Ki_dce = design_dc_ext(bw=20.0)
 stable_dce, c, d = check_and_print(
