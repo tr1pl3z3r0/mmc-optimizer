@@ -205,14 +205,14 @@ def _read_csv_ac() -> dict:
 
 
 def _read_csv_dc() -> dict:
-    """Columnas: Time, [Plot1/señal interna], Vc* (V0Σ)"""
+    """Columnas: Time, Zero-Order Hold (V0Σ real), Vc* (referencia=450)"""
     df = pd.read_csv(CSV_DC, header=None, comment="%")
     df = df.apply(pd.to_numeric, errors="coerce").dropna()
-    if df.shape[1] < 3:
-        raise RuntimeError(f"scope_dc.csv tiene {df.shape[1]} columnas, se esperaban ≥3.")
+    if df.shape[1] < 2:
+        raise RuntimeError(f"scope_dc.csv tiene {df.shape[1]} columnas, se esperaban ≥2.")
     return {
         "time": df.iloc[:, 0].to_numpy(),
-        "v0s":  df.iloc[:, 2].to_numpy(),  # Vc* = V0Σ  target=450
+        "v0s":  df.iloc[:, 1].to_numpy(),  # Zero-Order Hold = V0Σ real, target=450
     }
 
 
