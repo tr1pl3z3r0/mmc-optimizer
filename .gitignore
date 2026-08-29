@@ -1,6 +1,8 @@
-﻿plecs_env/
+plecs_env/
 results/
 __pycache__/
 *.pyc
+*.pyo
 debug_*.py
 test_sign.py
+*.png
