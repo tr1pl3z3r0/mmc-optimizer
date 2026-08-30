@@ -44,12 +44,12 @@ X0 = [1.8, 400.0, 675000.0, 4500000.0, 0.9, 60.0]
 # Todos los lazos: neg_fb clásico, ganancias positivas
 # c,d grandes porque gains intermedios (×2, ×3/E=×1/75) reducen ganancia efectiva
 SPACE = [
-    Real(0.01,       200.0,     name="a"),   # Kp AC
-    Real(10.0,       50000.0,   name="b"),   # Ki AC
-    Real(10000.0,    5000000.0, name="c"),   # Kp DC ext — planta efectiva ×75 más lenta
-    Real(100000.0,   50000000.0,name="d"),   # Ki DC ext
-    Real(0.01,       5.0,       name="e"),   # Kp DC int
-    Real(1.0,        500.0,     name="f"),   # Ki DC int
+    Real(0.01,       200.0,      name="a", prior="log-uniform"),  # Kp AC
+    Real(10.0,       50000.0,    name="b", prior="log-uniform"),  # Ki AC
+    Real(1000.0,     50000000.0, name="c", prior="log-uniform"),  # Kp DC ext
+    Real(10000.0,    500000000.0,name="d", prior="log-uniform"),  # Ki DC ext
+    Real(0.01,       5.0,        name="e", prior="log-uniform"),  # Kp DC int
+    Real(1.0,        500.0,      name="f", prior="log-uniform"),  # Ki DC int
 ]
 
 PARAM_NAMES = ["a", "b", "c", "d", "e", "f"]
