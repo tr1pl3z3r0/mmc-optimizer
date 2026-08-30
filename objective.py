@@ -54,7 +54,8 @@ def compute_error(sim_data: dict, verbose: bool = False) -> dict:
     ssv = _ss_error_norm(v0s, TARGET_V0S)
 
     ac_error = (rmse1 + ss1) * 0.5 + (rmse2 + ss2) * 0.5
-    dc_error = rmse_v + ssv
+    # Clampear dc_error para que el GP distinga gradientes incluso cuando diverge
+    dc_error = min(rmse_v + ssv, 1e4)
 
     total = WEIGHT_AC * ac_error + WEIGHT_DC * dc_error + pen1 + pen2 + penv
 

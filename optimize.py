@@ -38,18 +38,23 @@ threading.Thread(target=_listen_for_stop, daemon=True).start()
 
 # ── Puntos de diseño analíticos (semilla) ────────────────────────────────────
 # Calculados en design_points.py — polos LC verificados en semiplano izquierdo
-X0 = [1.8, 400.0, 675000.0, 4500000.0, 0.9, 60.0]
+# Semillas: analítica + mejores observadas en log (eval 13 y 26 tuvieron menor ss_v0s)
+X0 = [
+    [1.8,   400.0,  675000.0, 4500000.0, 0.9,   60.0],   # semilla analítica
+    [0.188, 40.86,  1184.0,   976227.0,  0.116, 6.2],     # eval 13: ss_v0s=65957
+    [0.011, 5051.0, 1552.0,   10000.0,   0.01,  1.0],     # eval 30: ss_v0s=6330
+    [0.026, 1938.0, 62687.0,  417035.0,  0.182, 209.4],   # eval 6: ss_v0s=7347K
+]
 
 # ── Espacio de búsqueda ───────────────────────────────────────────────────────
-# Todos los lazos: neg_fb clásico, ganancias positivas
-# c,d grandes porque gains intermedios (×2, ×3/E=×1/75) reducen ganancia efectiva
+# Acotado según observaciones: mejores c,d están en rangos bajos
 SPACE = [
-    Real(0.01,       200.0,      name="a", prior="log-uniform"),  # Kp AC
-    Real(10.0,       50000.0,    name="b", prior="log-uniform"),  # Ki AC
-    Real(1000.0,     50000000.0, name="c", prior="log-uniform"),  # Kp DC ext
-    Real(10000.0,    500000000.0,name="d", prior="log-uniform"),  # Ki DC ext
-    Real(0.01,       5.0,        name="e", prior="log-uniform"),  # Kp DC int
-    Real(1.0,        500.0,      name="f", prior="log-uniform"),  # Ki DC int
+    Real(0.01,    200.0,    name="a", prior="log-uniform"),  # Kp AC
+    Real(10.0,    50000.0,  name="b", prior="log-uniform"),  # Ki AC
+    Real(1000.0,  5000000.0,name="c", prior="log-uniform"),  # Kp DC ext — acotado
+    Real(10000.0, 50000000.0,name="d",prior="log-uniform"),  # Ki DC ext — acotado
+    Real(0.01,    5.0,      name="e", prior="log-uniform"),  # Kp DC int
+    Real(1.0,     500.0,    name="f", prior="log-uniform"),  # Ki DC int
 ]
 
 PARAM_NAMES = ["a", "b", "c", "d", "e", "f"]
