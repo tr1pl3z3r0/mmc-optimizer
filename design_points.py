@@ -63,14 +63,19 @@ def design_ac(bw=400.0):
 
 def design_dc_ext(bw=20.0):
     """
-    Planta DC ext: 1/(n*C*Vc*s)  integrador puro, ganancia = 1/(n*C*Vc)
-    L(s) = (Kp*s+Ki) / (s * n*C*Vc*s) = (Kp*s+Ki)/(n*C*Vc*s²)
-    Margen de fase 60°: cero PI en w_z = bw/tan(60°+90°)...
-    Regla práctica para doble integrador: w_z = bw/3, Kp = n*C*Vc*bw²/Ki
+    Planta efectiva vista por el PI externo:
+      G_eff(s) = (Gain1 * Gain) * G_int_cl(s) * G_dc(s)
+               = (2 * 3/E) * 1 * 1/(n*C*Vc*s)
+               = 1 / (E/6 * n*C*Vc * s)
+               = 1 / (75 * n*C*Vc * s)   con E=450
+    Los gains intermedios (×2, ×3/E) reducen la ganancia efectiva x75,
+    por lo que Kp,Ki deben ser 75 veces mayores que sin considerar los gains.
     """
-    nCVc = n * C * Vc
-    wz   = bw / 3.0          # cero PI
-    Ki   = nCVc * bw**2 / (bw / wz)   # simplificado
+    E    = 450.0
+    scale = (2 * 3 / E)          # = 6/450 = 1/75
+    nCVc_eff = n * C * Vc / scale  # planta efectiva denominador = 75*n*C*Vc
+    wz   = bw / 3.0
+    Ki   = nCVc_eff * bw**2 / (bw / wz)
     Kp   = Ki / wz
     return Kp, Ki
 

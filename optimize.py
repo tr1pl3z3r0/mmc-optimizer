@@ -38,17 +38,18 @@ threading.Thread(target=_listen_for_stop, daemon=True).start()
 
 # ── Puntos de diseño analíticos (semilla) ────────────────────────────────────
 # Calculados en design_points.py — polos LC verificados en semiplano izquierdo
-X0 = [1.8, 400.0, 9000.0, 60000.0, 0.9, 60.0]
+X0 = [1.8, 400.0, 675000.0, 4500000.0, 0.9, 60.0]
 
 # ── Espacio de búsqueda ───────────────────────────────────────────────────────
-# Error DC ext = E - V0Σ → neg_fb clásico → c,d positivos
+# Todos los lazos: neg_fb clásico, ganancias positivas
+# c,d grandes porque gains intermedios (×2, ×3/E=×1/75) reducen ganancia efectiva
 SPACE = [
-    Real(0.01,      200.0,   name="a"),   # Kp AC  — neg_fb clásico, positivo
-    Real(10.0,      50000.0, name="b"),   # Ki AC  — neg_fb clásico, positivo
-    Real(100.0,     50000.0, name="c"),   # Kp DC ext — neg_fb clásico, positivo
-    Real(1000.0,    500000.0,name="d"),   # Ki DC ext — neg_fb clásico, positivo
-    Real(0.01,      5.0,     name="e"),   # Kp DC int — neg_fb clásico, positivo
-    Real(1.0,       500.0,   name="f"),   # Ki DC int — neg_fb clásico, positivo
+    Real(0.01,       200.0,     name="a"),   # Kp AC
+    Real(10.0,       50000.0,   name="b"),   # Ki AC
+    Real(10000.0,    5000000.0, name="c"),   # Kp DC ext — planta efectiva ×75 más lenta
+    Real(100000.0,   50000000.0,name="d"),   # Ki DC ext
+    Real(0.01,       5.0,       name="e"),   # Kp DC int
+    Real(1.0,        500.0,     name="f"),   # Ki DC int
 ]
 
 PARAM_NAMES = ["a", "b", "c", "d", "e", "f"]
@@ -103,13 +104,12 @@ def _poles_stable(Kp, Ki, plant_num, plant_den, pos_fb=True):
 
 
 def _is_stable_point(a, b, c, d, e, f):
-    Ltot, R, n_mmc, C_cap, Vc = 4.5e-3, 1.0, 3, 1.0, 150.0  # Ltot = L + 2*Ll
-    # AC: realimentación negativa clásica, controlador positivo
-    ok_ac  = _poles_stable(a, b, [1.0], [Ltot, R],                  pos_fb=False)
-    # DC externo: error = E - V0Σ → neg_fb clásico, controlador positivo
-    ok_dce = _poles_stable(c, d, [1.0], [n_mmc * C_cap * Vc, 0.0], pos_fb=False)
-    # DC interno: neg_fb clásico, controlador positivo
-    ok_dci = _poles_stable(e, f, [1.0], [Ltot, 0.0],                pos_fb=False)
+    Ltot, R, n_mmc, C_cap, Vc, E = 4.5e-3, 1.0, 3, 1.0, 150.0, 450.0
+    scale = 2 * 3 / E                      # gains intermedios = 1/75
+    nCVc_eff = n_mmc * C_cap * Vc / scale  # planta efectiva = 75*450 = 33750
+    ok_ac  = _poles_stable(a, b, [1.0], [Ltot, R],       pos_fb=False)
+    ok_dce = _poles_stable(c, d, [1.0], [nCVc_eff, 0.0], pos_fb=False)
+    ok_dci = _poles_stable(e, f, [1.0], [Ltot, 0.0],     pos_fb=False)
     return ok_ac and ok_dce and ok_dci
 
 
