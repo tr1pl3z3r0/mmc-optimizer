@@ -53,6 +53,17 @@ def compute_error(sim_data: dict, verbose: bool = False) -> dict:
     ss2 = _ss_error_norm(sig2, TARGET_SIG2)
     ssv = _ss_error_norm(v0s, TARGET_V0S)
 
+    # Detección de colapso: V0Σ diverge Y id/iq saturados (ss1 pequeño pero rmse_v0s enorme)
+    # En operación normal ss1*TARGET_SIG1 > 1A; si colapsa el capacitor id/iq se fijan en valor bajo
+    COLLAPSE_RMSE_V = 1000.0   # rmse_v0s normalizado > esto indica divergencia DC
+    COLLAPSE_SS1    = 0.5      # ss1*TARGET_SIG1 < esto indica id/iq saturados
+    if rmse_v > COLLAPSE_RMSE_V and ss1 * TARGET_SIG1 < COLLAPSE_SS1:
+        return {"total": 1e6, "rmse1": rmse1*TARGET_SIG1, "rmse2": rmse2*TARGET_SIG2,
+                "rmse_v0s": rmse_v*TARGET_V0S, "t_settling1": t_set1, "t_settling2": t_set2,
+                "t_settling_v0s": t_setv, "in_band1": in1, "in_band2": in2, "in_band_v0s": inv,
+                "ss_error1": ss1*TARGET_SIG1, "ss_error2": ss2*TARGET_SIG2,
+                "ss_error_v0s": ssv*TARGET_V0S, "collapse": True}
+
     ac_error = (rmse1 + ss1) * 0.5 + (rmse2 + ss2) * 0.5
     # Clampear dc_error para que el GP distinga gradientes incluso cuando diverge
     dc_error = min(rmse_v + ssv, 1e4)

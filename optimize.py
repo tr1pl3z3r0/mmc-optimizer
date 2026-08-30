@@ -79,7 +79,7 @@ _LOG_HEADER = [
     "t_set1", "t_set2", "t_set_v0s",
     "in1", "in2", "in_v0s",
     "ss1", "ss2", "ss_v0s",
-    "total_error", "timestamp",
+    "total_error", "collapse", "timestamp",
 ]
 
 
@@ -143,6 +143,7 @@ def objective_fn(a, b, c, d, e, f):
         return 1e6
 
     total = err["total"]
+    collapsed = err.get("collapse", False)
 
     row = {
         "eval": _eval_count,
@@ -160,9 +161,14 @@ def objective_fn(a, b, c, d, e, f):
         "ss2":       round(err["ss_error2"], 4),
         "ss_v0s":    round(err["ss_error_v0s"], 4),
         "total_error": round(total, 8),
+        "collapse":  collapsed,
         "timestamp": datetime.now().isoformat(timespec="seconds"),
     }
     _append_log(row)
+
+    if collapsed:
+        print(f"  [eval {_eval_count}] COLAPSO (id/iq saturados + V0Σ diverge) — penalizado", flush=True)
+        return total
 
     if total < _best_error:
         _best_error  = total
