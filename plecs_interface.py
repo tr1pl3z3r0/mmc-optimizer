@@ -124,13 +124,13 @@ def _run_simulation_gui():
         time.sleep(0.2)
 
     print("    [sim] Simulando — esperando fin...", flush=True)
-    deadline_end = time.time() + 30.0  # 0.05s sim no debería tardar más de 30s
+    deadline_end = time.time() + 120.0
     while time.time() < deadline_end:
         if not _is_sim_running():
             break
         time.sleep(0.2)
 
-    time.sleep(0.5)
+    time.sleep(2.0)
 
 
 # ── CSV export ────────────────────────────────────────────────────────────────
