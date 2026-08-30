@@ -55,8 +55,8 @@ SPACE = [
 PARAM_NAMES = ["a", "b", "c", "d", "e", "f"]
 
 # ── Criterios ─────────────────────────────────────────────────────────────────
-N_CALLS        = 60   # evaluaciones totales (incluye n_initial_points)
-N_INITIAL      = 10   # exploraciones aleatorias antes de usar el modelo GP
+N_CALLS        = 1000  # evaluaciones totales (incluye n_initial_points)
+N_INITIAL      = 20   # exploraciones aleatorias antes de usar el modelo GP
 MIN_ERROR      = 0.05
 
 # ── Log ───────────────────────────────────────────────────────────────────────
