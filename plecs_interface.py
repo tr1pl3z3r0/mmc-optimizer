@@ -112,7 +112,7 @@ def _stop_simulation():
 
 def _run_simulation_gui():
     _stop_simulation()
-    time.sleep(0.3)
+    time.sleep(0.2)
     _focus_model_win()
     pyautogui.hotkey("ctrl", "t")
 
@@ -121,16 +121,16 @@ def _run_simulation_gui():
     while time.time() < deadline_start:
         if _is_sim_running():
             break
-        time.sleep(0.3)
+        time.sleep(0.2)
 
     print("    [sim] Simulando — esperando fin...", flush=True)
-    deadline_end = time.time() + 120.0
+    deadline_end = time.time() + 30.0  # 0.05s sim no debería tardar más de 30s
     while time.time() < deadline_end:
         if not _is_sim_running():
             break
-        time.sleep(0.5)
+        time.sleep(0.2)
 
-    time.sleep(1.0)
+    time.sleep(0.5)
 
 
 # ── CSV export ────────────────────────────────────────────────────────────────
@@ -142,17 +142,17 @@ def _export_scope_to(scope_title: str, csv_path: Path):
     app = Application(backend="uia").connect(title=scope_title)
     scope_win = app.window(title=scope_title)
     scope_win.set_focus()
-    time.sleep(0.4)
+    time.sleep(0.3)
 
     scope_win.child_window(title="File", control_type="MenuItem").click_input()
-    time.sleep(0.5)
+    time.sleep(0.3)
     scope_win.child_window(title="Export", control_type="MenuItem").click_input()
-    time.sleep(0.5)
+    time.sleep(0.3)
 
     csv_item = scope_win.child_window(title="as CSV", control_type="MenuItem")
     rect = csv_item.rectangle()
     pyautogui.moveTo((rect.left + rect.right) // 2, (rect.top + rect.bottom) // 2)
-    time.sleep(0.5)
+    time.sleep(0.3)
 
     desktop = Desktop(backend="uia")
     all_item = None
@@ -172,20 +172,20 @@ def _export_scope_to(scope_title: str, csv_path: Path):
 
     rect2 = all_item.rectangle()
     pyautogui.click((rect2.left + rect2.right) // 2, (rect2.top + rect2.bottom) // 2)
-    time.sleep(1.5)
+    time.sleep(1.0)
 
     pyautogui.hotkey("ctrl", "a")
-    time.sleep(0.2)
+    time.sleep(0.15)
     pyautogui.typewrite(str(csv_path), interval=0.02)
-    time.sleep(0.3)
-    pyautogui.press("enter")
-    time.sleep(1.2)
-
-    # Confirmar reemplazo
-    pyautogui.press("left")
     time.sleep(0.2)
     pyautogui.press("enter")
     time.sleep(0.8)
+
+    # Confirmar reemplazo
+    pyautogui.press("left")
+    time.sleep(0.15)
+    pyautogui.press("enter")
+    time.sleep(0.5)
 
     if not csv_path.exists():
         raise RuntimeError(f"CSV no fue generado en {csv_path}.")
